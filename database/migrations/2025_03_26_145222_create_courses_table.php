@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('course_name');
             $table->foreignIdFor(Category::class);
             $table->foreignIdFor(Payment::class);
+            $table->foreignIdFor(User::class, 'instructor_id');
             $table->timestamps();
         });
 
@@ -37,5 +38,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('courses');
+        Schema::dropIfExists('course_user');
     }
 };
