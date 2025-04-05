@@ -97,4 +97,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ReviewCv::class, 'hrd_id');
     }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'student_id');
+    }
 }
