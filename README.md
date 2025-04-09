@@ -38,6 +38,24 @@
 ## Endpoint
 method | url | json | description
 -------|-----|------|------------
-POST | api/register | (name, email, password, role_id, address(nullable), phone_nummber, img_url(nullable)) | register
+POST | api/register | (name, email, password, password_confirmation, role_id, address(nullable), phone_number, img_url(nullable)) | register
 POST | api/login | (email, password) | login
 GET | api/logout | - | logout
+
+## Database Structure
+### User
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT, NOT NULL
+ name | VARCHAR , NOT NULL
+ password | VARCHAR, NOT NULL
+ address | TEXT, NULLABLE
+ phone_number | VARCHAR, NOT NULL
+ role_id | FOREIGN KEY -> roles, NOT NULL, DEFAULT = 4
+ img_url | VARCHAR, NULLABLE
+
+### Role
+ attributes | description
+ -----------|------------
+ id | PRIMARY KEY, INT, NOT NULL
+ role_name | ENUM ('admin', 'instructor', 'hrd', 'student'), NOT NULL
