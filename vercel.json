@@ -3,5 +3,12 @@
         "api/*.php": {
             "runtime": "vercel-php@0.5.2"
         }
-    }
+    },
+    "buildCommand": "vite build",
+    "outputDirectory": "public",
+    "public": true,
+    "routes": [
+        { "src": "/build/(.*)", "dest": "/public/build/" },
+        { "src": "/(.*)", "dest": "/api/index.php" }
+    ]
 }
