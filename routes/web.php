@@ -12,11 +12,11 @@ Route::get('test', [CourseController::class, 'index']);
 
 // main api
 
-Route::post('api/register', [AuthController::class, 'register']);
-Route::post('api/login', [AuthController::class, 'login'])->name('login');
+// Route::post('api/register', [AuthController::class, 'register']);
+// Route::post('api/login', [AuthController::class, 'login'])->name('login');
 
-Route::middleware('auth:sanctum')->group(function() {
-    Route::get('api/logout', [AuthController::class, 'logout']);
+// Route::middleware('auth:sanctum')->group(function() {
+//     Route::get('api/logout', [AuthController::class, 'logout']);
 
-    Route::apiResource('api/courses', CourseController::class);
-});
+//     Route::apiResource('api/courses', CourseController::class);
+// });
