@@ -12,7 +12,7 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('admin-only', only: ['store', 'update', 'destro'])
+            new Middleware('admin-only', only: ['store', 'update', 'destroy'])
         ];
     }
     /**
@@ -70,6 +70,8 @@ class CourseController extends Controller implements HasMiddleware
      */
     public function destroy(Course $course)
     {
-        //
+        $course->delete();
+
+        return response(null, 204);
     }
 }

@@ -17,14 +17,15 @@ class CourseManagementTest extends TestCase
         - only admin can create course x
         - can get all courses x
         - can get course by id x
-        - can update course
-        - only admin can update course
-        - can delete course
-        - only admin can delete course
+        - can update course x
+        - only admin can update course x
+        - can delete course x
+        - only admin can delete course x
         - student can attach course
         - only student can attach course
         - student can cancel course
         - only student can cancel course
+        - other student cannot cancel other student's course
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
     {
@@ -136,5 +137,47 @@ class CourseManagementTest extends TestCase
                 'id' => $course->id,
                 'category_id' => 1
             ]);
+    }
+
+    public function test_only_admin_can_update_course(): void
+    {
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $response = $this->actingAs($instructor)->putJson('api/courses/' . $course->id, [
+            'course_name' => $course->course_name,
+            'category_id' => 2,
+            'instructor_id' => $instructor->id
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_can_delete_course(): void
+    {
+        $admin = $this->dummy_user();
+
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $response = $this->actingAs($admin)->delete('api/courses/' . $course->id);
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('courses', [
+            'id' => $course->id
+        ]);
+    }
+
+    public function test_only_admin_can_delete_course(): void
+    {
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $response = $this->actingAs($instructor)->delete('api/courses/' . $course->id);
+
+        $response->assertStatus(403);
     }
 }
