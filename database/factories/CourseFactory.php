@@ -17,7 +17,8 @@ class CourseFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'course_name' => fake()->word(),
+            'category_id' => fake()->randomElement([1,2])
         ];
     }
 }

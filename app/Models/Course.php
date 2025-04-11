@@ -16,7 +16,7 @@ class Course extends Model
     protected $fillable = [
         'course_name',
         'category_id',
-        'payment_id'
+        'instructor_id'
     ];
 
     public function students(): BelongsToMany

@@ -19,15 +19,15 @@ return new class extends Migration
             $table->id();
             $table->string('course_name');
             $table->foreignIdFor(Category::class);
-            $table->foreignIdFor(Payment::class);
             $table->foreignIdFor(User::class, 'instructor_id');
             $table->timestamps();
         });
-
+        
         Schema::create('course_user', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Course::class);
             $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Payment::class);
             $table->timestamps();
         });
     }

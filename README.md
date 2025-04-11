@@ -36,26 +36,56 @@
    ```
 
 ## Endpoint
-method | url | json | description
--------|-----|------|------------
-POST | api/register | (name, email, password, password_confirmation, role_id, address(nullable), phone_number, img_url(nullable)) | register
-POST | api/login | (email, password) | login
-GET | api/logout | - | logout
+method | url | request json | response | description | protected
+-------|-----|--------------|----------|-------------|----------
+POST | api/register | (name, email, password, password_confirmation, role_id, address(nullable), phone_number, img_url(nullable)) | - | register | [ ]
+POST | api/login | (email, password) | (token) | login | [ ]
+GET | api/logout | - | - | logout | [x]
+POST | api/courses | (course_name, category_id, instructor_id) | (course) | create new course | [x]
+GET | api/courses | - | (courses) | get all courses | [x]
+GET | api/courses/:id | - | (course) | get course by id | [x]
+PUT | api/courses/:id | (course_name, category_id, instructor_id) | (course) | update course by id | [x]
+DELETE | api/courses/:id | - | - | delete course by id | [x]
+POST | api/courses/:id/register | (user_id) | - | student assigning course by id | [x]
+POST | api/courses/:id/abort | (user_id) | - | student cancelling course by id | [x]
+GET | api/courses/:id/students | - | (students) | get all students by course id | [x]
 
 ## Database Structure
 ### User
- attributes | description
- -----------|------------
- id | PRIMARY KEY, INT, NOT NULL
- name | VARCHAR , NOT NULL
- password | VARCHAR, NOT NULL
- address | TEXT, NULLABLE
- phone_number | VARCHAR, NOT NULL
- role_id | FOREIGN KEY -> roles, NOT NULL, DEFAULT = 4
- img_url | VARCHAR, NULLABLE
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+name | VARCHAR , NOT NULL
+password | VARCHAR, NOT NULL
+address | TEXT, NULLABLE
+phone_number | VARCHAR, NOT NULL
+role_id | FOREIGN KEY -> roles, NOT NULL, DEFAULT = 4
+img_url | VARCHAR, NULLABLE
 
 ### Role
- attributes | description
- -----------|------------
- id | PRIMARY KEY, INT, NOT NULL
- role_name | ENUM ('admin', 'instructor', 'hrd', 'student'), NOT NULL
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+role_name | ENUM ('admin', 'instructor', 'hrd', 'student'), NOT NULL
+
+### Course
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+course_name | VARCHAR, NOT NULL
+category_id | FOREIGN KEY -> categories, NOT NULL
+payment_id | FOREIGN KEY -> payments, NOT NULL
+instructor_id | FOREIGN KEY -> users, NOT NULL
+
+### course_user
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+course_id | FOREIGN KEY -> courses, NOT NULL
+user_id | FOREIGN KEY -> users, NOT NULL
+
+### Category
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+category_name | VARCHAR, NOT NULL

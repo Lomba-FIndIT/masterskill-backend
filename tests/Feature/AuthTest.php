@@ -76,6 +76,7 @@ class AuthTest extends TestCase
 
         $response->assertStatus(400);
         $this->assertDatabaseMissing('users', [
+            'name' => 'instructor_test',
             'role_id' => 2
         ]);
     }
@@ -93,6 +94,7 @@ class AuthTest extends TestCase
 
         $response->assertStatus(400);
         $this->assertDatabaseMissing('users', [
+            'name' => 'hrd_test',
             'role_id' => 3
         ]);
     }
