@@ -8,9 +8,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', function() {
-    return response(["messgae" => "test"]);
-});
+Route::get('test', [CourseController::class, 'index']);
 
 // main api
 
