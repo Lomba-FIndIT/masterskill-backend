@@ -19,14 +19,15 @@ return new class extends Migration
             $table->id();
             $table->string('course_name');
             $table->foreignIdFor(Category::class);
+            $table->bigInteger('price');
             $table->foreignIdFor(User::class, 'instructor_id');
             $table->timestamps();
         });
         
         Schema::create('course_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Course::class);
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Course::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Payment::class);
             $table->timestamps();
         });

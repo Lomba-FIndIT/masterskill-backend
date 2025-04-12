@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Course;
+use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -21,11 +22,10 @@ class CourseManagementTest extends TestCase
         - only admin can update course x
         - can delete course x
         - only admin can delete course x
-        - student can attach course
-        - only student can attach course
-        - student can cancel course
-        - only student can cancel course
-        - other student cannot cancel other student's course
+        - student can attach course x
+        - only student can attach course x
+        - student can cancel course x
+        - only student can cancel course x
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
     {
@@ -53,7 +53,8 @@ class CourseManagementTest extends TestCase
         $response = $this->actingAs($admin)->postJson('api/courses', [
             'course_name' => 'test course',
             'category_id' => 1,
-            'instructor_id' => $instructor->id
+            'instructor_id' => $instructor->id,
+            'price' => 20000
         ]);
 
         $response
@@ -61,12 +62,14 @@ class CourseManagementTest extends TestCase
             ->assertJsonStructure([
                 'course_name',
                 'category_id',
-                'instructor_id'
+                'instructor_id',
+                'price'
             ]);
         $this->assertDatabaseHas('courses', [
             'course_name' => 'test course',
             'category_id' => 1,
-            'instructor_id' => $instructor->id
+            'instructor_id' => $instructor->id,
+            'price' => 20000
         ]);
     }
 
@@ -79,7 +82,8 @@ class CourseManagementTest extends TestCase
         $response = $this->actingAs($student)->postJson('api/courses', [
             'course_name' => 'test course',
             'category_id' => 1,
-            'instructor_id' => $instructor->id
+            'instructor_id' => $instructor->id,
+            'price' => 10000
         ]);
 
         $response->assertStatus(403);
@@ -109,7 +113,8 @@ class CourseManagementTest extends TestCase
             ->assertJsonStructure([
             'course_name',
             'category_id',
-            'instructor_id'
+            'instructor_id',
+            'price'
         ]);
     }
 
@@ -124,7 +129,8 @@ class CourseManagementTest extends TestCase
         $response = $this->actingAs($admin)->putJson('api/courses/' . $course->id, [
             'course_name' => $course->course_name,
             'category_id' => 2,
-            'instructor_id' => $instructor->id
+            'instructor_id' => $instructor->id,
+            'price' => $course->price
         ]);
 
         $response->assertStatus(200);
@@ -148,7 +154,8 @@ class CourseManagementTest extends TestCase
         $response = $this->actingAs($instructor)->putJson('api/courses/' . $course->id, [
             'course_name' => $course->course_name,
             'category_id' => 2,
-            'instructor_id' => $instructor->id
+            'instructor_id' => $instructor->id,
+            'price' => $course->price
         ]);
 
         $response->assertStatus(403);
@@ -177,6 +184,72 @@ class CourseManagementTest extends TestCase
         $course = $this->dummy_course($instructor->id);
 
         $response = $this->actingAs($instructor)->delete('api/courses/' . $course->id);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_student_can_attach_course(): void
+    {
+        $student = $this->dummy_user('student', 4);
+
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $response = $this->actingAs($student)->get('api/courses/' . $course->id . '/join');
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('course_user', [
+            'course_id' => $course->id,
+            'user_id' => $student->id
+        ]);
+    }
+
+    public function test_only_student_can_attach_course(): void
+    {
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $response = $this->actingAs($instructor)->get('api/courses/' . $course->id . '/join');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_student_can_cancel_course(): void
+    {
+        $student = $this->dummy_user('student', 4);
+
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $this->actingAs($student)->get('api/courses/' . $course->id . '/join');
+
+        $payment = Payment::find($course->students()->wherePivot('user_id', $student->id)->first()->pivot->payment_id);
+        
+        $response = $this->actingAs($student)->delete('api/courses/' . $course->id . '/join');
+
+        $response->assertStatus(204);
+        $this
+            ->assertDatabaseMissing('course_user', [
+                'course_id' => $course->id,
+                'user_id' => $student->id
+            ])
+            ->assertDatabaseMissing('payments', [
+                'id' => $payment->id
+            ]);
+    }
+
+    public function test_only_student_can_cancel_course(): void
+    {
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $this->actingAs($instructor)->get('api/courses/' . $course->id . '/join');
+        
+        $response = $this->actingAs($instructor)->delete('api/courses/' . $course->id . '/join');
 
         $response->assertStatus(403);
     }

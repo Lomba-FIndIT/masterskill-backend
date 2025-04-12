@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -33,7 +34,8 @@ class CourseController extends Controller implements HasMiddleware
         $validatedFields = $request->validate([
             'course_name' => 'required',
             'category_id' => 'required',
-            'instructor_id' => 'required'
+            'instructor_id' => 'required',
+            'price' => 'required'
         ]);
 
         $course = Course::create($validatedFields);
@@ -57,7 +59,8 @@ class CourseController extends Controller implements HasMiddleware
         $validatedFields = $request->validate([
             'course_name' => 'required',
             'category_id' => 'required',
-            'instructor_id' => 'required'
+            'instructor_id' => 'required',
+            'price' => 'required'
         ]);
 
         $course->update($validatedFields);
@@ -71,6 +74,33 @@ class CourseController extends Controller implements HasMiddleware
     public function destroy(Course $course)
     {
         $course->delete();
+
+        return response(null, 204);
+    }
+
+    public function attach(Request $request, Course $course)
+    {
+        $user = $request->user();
+
+        $payment = Payment::create([
+            'student_id' => $user->id
+        ]);
+
+        $course->students()->attach($user->id, ['payment_id' => $payment->id]);
+
+        return response(null, 201);
+    }
+
+    public function detach(Request $request, Course $course)
+    {
+        $user = $request->user();
+
+        $student = $course->students()->wherePivot('user_id', $user->id)->first();
+
+        $payment = Payment::find($student->pivot->payment_id);
+        $payment->delete();
+
+        $course->students()->detach($user->id);
 
         return response(null, 204);
     }

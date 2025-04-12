@@ -41,13 +41,13 @@ method | url | request json | response | description | protected
 POST | api/register | (name, email, password, password_confirmation, role_id, address(nullable), phone_number, img_url(nullable)) | - | register | [ ]
 POST | api/login | (email, password) | (token) | login | [ ]
 GET | api/logout | - | - | logout | [x]
-POST | api/courses | (course_name, category_id, instructor_id) | (course) | create new course | [x]
+POST | api/courses | (course_name, category_id, instructor_id, price) | (course) | create new course | [x]
 GET | api/courses | - | (courses) | get all courses | [x]
 GET | api/courses/:id | - | (course) | get course by id | [x]
-PUT | api/courses/:id | (course_name, category_id, instructor_id) | (course) | update course by id | [x]
+PUT | api/courses/:id | (course_name, category_id, instructor_id, price) | (course) | update course by id | [x]
 DELETE | api/courses/:id | - | - | delete course by id | [x]
-POST | api/courses/:id/register | (user_id) | - | student assigning course by id | [x]
-POST | api/courses/:id/abort | (user_id) | - | student cancelling course by id | [x]
+GET | api/courses/:id/join | - | - | student assigning course by id | [x]
+DELETE | api/courses/:id/join | - | - | student cancelling course by id | [x]
 GET | api/courses/:id/students | - | (students) | get all students by course id | [x]
 
 ## Database Structure
@@ -74,7 +74,7 @@ attributes | description
 id | PRIMARY KEY, INT, NOT NULL
 course_name | VARCHAR, NOT NULL
 category_id | FOREIGN KEY -> categories, NOT NULL
-payment_id | FOREIGN KEY -> payments, NOT NULL
+price | INT, NOT NULL
 instructor_id | FOREIGN KEY -> users, NOT NULL
 
 ### course_user
@@ -83,9 +83,17 @@ attributes | description
 id | PRIMARY KEY, INT, NOT NULL
 course_id | FOREIGN KEY -> courses, NOT NULL
 user_id | FOREIGN KEY -> users, NOT NULL
+payment_id | FOREIGN KEY -> payments, NOT NULL
 
 ### Category
 attributes | description
 -----------|------------
 id | PRIMARY KEY, INT, NOT NULL
 category_name | VARCHAR, NOT NULL
+
+### Payment
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+paid | BOOLEAN, NOT NULL
+student_id | FOREIGN KEY -> users, NOT NULL

@@ -27,5 +27,11 @@ class AppServiceProvider extends ServiceProvider
                 ? Response::allow()
                 : Response::deny();
         });
+
+        Gate::define('student-only', function (User $user) {
+            return $user->role_id === 4
+                ? Response::allow()
+                : Response::deny();
+        });
     }
 }

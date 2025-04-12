@@ -14,4 +14,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('logout', [AuthController::class, 'logout']);
 
     Route::apiResource('courses', CourseController::class);
+    Route::get('courses/{course}/join', [CourseController::class, 'attach'])->middleware('student-only');
+    Route::delete('courses/{course}/join', [CourseController::class, 'detach'])->middleware('student-only');
 });

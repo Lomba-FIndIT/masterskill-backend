@@ -10,7 +10,6 @@ class Payment extends Model
 {
     //
     protected $fillable = [
-        'price',
         'paid',
         'student_id'
     ];

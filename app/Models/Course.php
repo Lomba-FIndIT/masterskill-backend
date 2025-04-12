@@ -16,12 +16,13 @@ class Course extends Model
     protected $fillable = [
         'course_name',
         'category_id',
-        'instructor_id'
+        'instructor_id',
+        'price'
     ];
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->withPivot('payment_id');
     }
 
     public function category(): BelongsTo

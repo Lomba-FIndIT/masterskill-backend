@@ -14,8 +14,7 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('price');
-            $table->boolean('paid');
+            $table->boolean('paid')->default(false);
             $table->foreignIdFor(User::class, 'student_id');
             $table->timestamps();
         });
