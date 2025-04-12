@@ -104,4 +104,11 @@ class CourseController extends Controller implements HasMiddleware
 
         return response(null, 204);
     }
+
+    public function students(Course $course)
+    {
+        $students = $course->students;
+
+        return response($students);
+    }
 }

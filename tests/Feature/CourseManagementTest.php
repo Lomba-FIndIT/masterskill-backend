@@ -26,6 +26,7 @@ class CourseManagementTest extends TestCase
         - only student can attach course x
         - student can cancel course x
         - only student can cancel course x
+        - can get all students by course id
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
     {
@@ -252,5 +253,25 @@ class CourseManagementTest extends TestCase
         $response = $this->actingAs($instructor)->delete('api/courses/' . $course->id . '/join');
 
         $response->assertStatus(403);
+    }
+
+    public function test_can_get_all_students_by_course_id(): void
+    {
+        $student = $this->dummy_user('student', 4);
+
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+        
+        for ($i = 0; $i < 5; $i++) {
+            $student_i = $this->dummy_user('student' . $i, 4);
+            $this->actingAs($student_i)->get('api/courses/' . $course->id . '/join');
+        }
+
+        $response = $this->actingAs($student)->get('api/courses/' . $course->id . '/students');
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonCount(5);
     }
 }
