@@ -49,6 +49,11 @@ DELETE | api/courses/:id | - | - | delete course by id | [x]
 GET | api/courses/:id/join | - | - | student assigning course by id | [x]
 DELETE | api/courses/:id/join | - | - | student cancelling course by id | [x]
 GET | api/courses/:id/students | - | (students) | get all students by course id | [x]
+POST | api/users | (name, email, password, password_confirmation, phone_number, role_id) | (user) | create user (instructor, hrd) | [x]
+GET | api/users | - | (users) | get all users | [x]
+GET | api/users/:id | - | (name, email, phone_number, role_id, address, img_url) | get user by id | [x]
+PUT | api/users | (name, email, address, phone_number, role_id, img_url) | (user) | update user profile | [x]
+DELETE | api/users/:id | - | - | delete user by id | [x]
 
 ## Database Structure
 ### User

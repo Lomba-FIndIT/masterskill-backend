@@ -22,10 +22,6 @@ class AuthController extends Controller
             return response(['message' => 'invalid role'], 400);
         }
 
-        if ($request['img_url'] !== null) {
-            $credentials['img_url'] = $request['img_url'];
-        }
-
         if ($request['address'] !== null) {
             $credentials['address'] = $request['address'];
         }

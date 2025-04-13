@@ -26,7 +26,7 @@ class CourseManagementTest extends TestCase
         - only student can attach course x
         - student can cancel course x
         - only student can cancel course x
-        - can get all students by course id
+        - can get all students by course id x
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
     {
