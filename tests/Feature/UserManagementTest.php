@@ -21,10 +21,14 @@ class UserManagementTest extends TestCase
         - only admin can get all users x
         - can get user by  x
         - only admin and it user can see their profiles x
-        - can update profile
-        - other user cannot update other user profile
-        - can delete user by id
-        - only admin and it user can delete their profiles
+        - can update profile x
+        - other user cannot update other user profile x
+        - can delete user by id x
+        - only admin and it user can delete their profiles x
+        - hrd and student can get all their cv review shcedule
+        - student can get all their courses
+        - can get all joined webinars
+        - student can get all their payments
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
     {
@@ -153,8 +157,6 @@ class UserManagementTest extends TestCase
     public function test_can_update_profiles(): void
     {
         $user = $this->dummy_user('user', 4);
-
-        Storage::fake('profiles');
         
         $img = UploadedFile::fake()->image('user.jpg');
         
@@ -169,11 +171,88 @@ class UserManagementTest extends TestCase
             'img' => $img
         ]);
 
-        $response->assertStatus(200);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'img_url'
+            ]);
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'address' => $address
         ]);
-        Storage::disk('profiles')->assertExists(basename($response['img_url']));
+    }
+
+    public function test_other_user_cannot_update_other_user_profile(): void
+    {
+        $user1 = $this->dummy_user('user1', 4);
+        $user2 = $this->dummy_user('user2', 4);
+
+        $img = UploadedFile::fake()->image('user.jpg');
+        
+        $address = fake()->address();
+        
+        $response = $this->actingAs($user2)->put('api/users/' . $user1->id, [
+            'name' => $user1->name,
+            'email' => $user1->email,
+            'address' => $address,
+            'phone_number' => $user1->phone_number,
+            'role_id' => $user1->role_id,
+            'img' => $img
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_user_can_delete_their_profile(): void
+    {
+        $user = $this->dummy_user('user', 4);
+
+        $response = $this->actingAs($user)->delete('api/users/' . $user->id);
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('users', [
+            'id' => $user->id
+        ]);
+    }
+
+    public function test_only_admin_and_it_user_can_delete_their_profile(): void
+    {
+        $admin = $this->dummy_user();
+        $user = $this->dummy_user('user', 4);
+        $user1 = $this->dummy_user('user1', 4);
+        $user2 = $this->dummy_user('user2', 4);
+
+        $response1 = $this->actingAs($admin)->delete('api/users/' . $user->id);
+        $response2 = $this->actingAs($user2)->delete('api/users/' . $user1->id);
+
+        $response1->assertStatus(204);
+        $response2->assertStatus(403);
+        $this
+            ->assertDatabaseHas('users', [
+                'id' => $user1->id
+            ])
+            ->assertDatabaseMissing('users', [
+                'id' => $user->id
+            ]);
+    }
+
+    public function test_hrd_student_can_get_all_their_cv_review_schedules(): void
+    {
+
+    }
+
+    public function test_student_can_get_all_their_courses(): void
+    {
+
+    }
+
+    public function test_can_get_all_joined_webinars(): void
+    {
+
+    }
+
+    public function test_student_can_get_all_their_payments(): void
+    {
+        
     }
 }

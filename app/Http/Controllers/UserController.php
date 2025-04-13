@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller implements HasMiddleware
 {
@@ -21,7 +22,7 @@ class UserController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::all()->makeHidden(['password', 'remember_token', 'img_url']);
 
         return response($users);
     }
@@ -49,7 +50,15 @@ class UserController extends Controller implements HasMiddleware
 
         $user = User::create($validatedFields);
 
-        return response($user, 201);
+        return response([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone_number' => $user->phone_number,
+            'role_id' => $user->role_id,
+            'address' => $user->address,
+            'img_url' => $user->img_url === null ? null : asset('storage/' . $user->img_url)
+        ], 201);
     }
 
     /**
@@ -58,6 +67,45 @@ class UserController extends Controller implements HasMiddleware
     public function show(User $user)
     {
         Gate::authorize('view', $user);
+
+        return response([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone_number' => $user->phone_number,
+            'role_id' => $user->role_id,
+            'address' => $user->address,
+            'img_url' => $user->img_url === null ? null : asset('storage/' . $user->img_url)
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, User $user)
+    {
+        Gate::authorize('modify', $user);
+
+        $validatedFields = $request->validate([
+            'name' => 'required',
+            'email' =>'required|email',
+            'role_id' => 'required',
+            'phone_number' => 'required',
+            'address' => 'required',
+            'img' => 'required|file|mimes:png,jpg,pdf'
+        ]);
+
+        if ($request->hasFile('img')) {
+
+            if ($user->img_url !== null) {
+                Storage::delete($user->img_url);
+            }
+            
+            $validatedFields['img_url'] = $request->img->store('profiles', 'public');
+        }
+
+        $user->update($validatedFields);
+
         return response([
             'id' => $user->id,
             'name' => $user->name,
@@ -70,37 +118,18 @@ class UserController extends Controller implements HasMiddleware
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, User $user)
-    {
-        $validatedFields = $request->validate([
-            'name' => 'required',
-            'email' =>'required|email',
-            'role_id' => 'required',
-            'phone_number' => 'required',
-            'address' => 'required',
-            'img' => 'required|file|mimes:png,jpg,pdf'
-        ]);
-
-        // if ($user->img_url !== null) {
-        //     Storage
-        // }
-
-        if ($request->hasFile('img')) {
-            $validatedFields['img_url'] = $request->img->store('profiles');
-        }
-
-        $user->update($validatedFields);
-
-        return response($user);
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(User $user)
     {
-        //
+        Gate::authorize('delete', $user);
+
+        if ($user->img_url !== null) {
+            Storage::delete($user->img_url);
+        }
+
+        $user->delete();
+
+        return response(['message' => 'success deleted'], 204);
     }
 }
