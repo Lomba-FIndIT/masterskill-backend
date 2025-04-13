@@ -27,6 +27,7 @@ class CourseManagementTest extends TestCase
         - student can cancel course x
         - only student can cancel course x
         - can get all students by course id x
+        - can get all videos by course id
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
     {
@@ -273,5 +274,10 @@ class CourseManagementTest extends TestCase
         $response
             ->assertStatus(200)
             ->assertJsonCount(5);
+    }
+
+    public function test_can_get_all_videos_by_course_id(): void
+    {
+        
     }
 }

@@ -49,12 +49,18 @@ DELETE | api/courses/:id | - | - | delete course by id | [x]
 GET | api/courses/:id/join | - | - | student assigning course by id | [x]
 DELETE | api/courses/:id/join | - | - | student cancelling course by id | [x]
 GET | api/courses/:id/students | - | (students) | get all students by course id | [x]
+GET | api/courses/:id/videos | - | (videos) | get all videos by course id | [x]
 POST | api/users | (name, email, password, password_confirmation, phone_number, role_id) | (user) | create user (instructor, hrd) | [x]
 GET | api/users | - | (users) | get all users | [x]
 GET | api/user | - | (id, name, email, phone_number, role_id, address, img_url) | get login user profile | [x]
 GET | api/users/:id | - | (id, name, email, phone_number, role_id, address, img_url) | get user by id | [x]
-PUT | api/users | (id, name, email, address, phone_number, role_id, img_url) | (user) | update user profile | [x]
+PUT | api/users | (id, name, email, address, phone_number, role_id, img(file)) | (user) | update user profile | [x]
 DELETE | api/users/:id | - | - | delete user by id | [x]
+POST | api/videos | (title, course_id, description, video(file)) | (title, course_id, description, video_url) | upload video | [x]
+GET | api/videos | - | (videos) | get all videos | [x]
+GET | api/videos/:id | - | (video) | get video by id | [x]
+PUT | api/videos/:id | (title, course_id, description, video(file)) | (title, course_id, description, video_url) | update video by id | [x]
+DELETE | api/videos/:id | - | delete video by id | [x]
 
 ## Database Structure
 ### User
@@ -108,3 +114,7 @@ student_id | FOREIGN KEY -> users, NOT NULL
 attributes | description
 -----------|------------
 id | PRIMARY KEY, INT, NOT NULL
+title | VARCHAR, NOT NULL
+course_id | FOREIGN KEY -> courses, NOT NULL
+description | TEXT, NOT NULL
+video_url | VARCHAR, NOT NULL

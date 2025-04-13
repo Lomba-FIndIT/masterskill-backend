@@ -20,7 +20,24 @@ class VideoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedFields = $request->validate([
+            'title' => 'required',
+            'course_id' => 'required',
+            'description' => 'required',
+            'video' => 'required|file|mimes:mp4'
+        ]);
+
+        $validatedFields['video_url'] = $request->video->store('courses-' . $validatedFields['course_id']);
+
+        $video = Video::create($validatedFields);
+
+        return response([
+            'id' => $video->id,
+            'title' => $video->title,
+            'course_id' => $video->course_id,
+            'description' => $video->description,
+            'video_url' => asset('storage/' . $video->video_url)
+        ], 201);
     }
 
     /**
