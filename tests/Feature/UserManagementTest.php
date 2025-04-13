@@ -25,6 +25,7 @@ class UserManagementTest extends TestCase
         - other user cannot update other user profile x
         - can delete user by id x
         - only admin and it user can delete their profiles x
+        - login user can get their profile
         - hrd and student can get all their cv review shcedule
         - student can get all their courses
         - can get all joined webinars
@@ -236,6 +237,25 @@ class UserManagementTest extends TestCase
             ]);
     }
 
+    public function test_login_user_can_get_their_profiles(): void
+    {
+        $user = $this->dummy_user('user', 4);
+
+        $response = $this->actingAs($user)->get('api/user');
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'name',
+                'email',
+                'role_id',
+                'address',
+                'phone_number',
+                'img_url'
+            ]);
+    }
+
     public function test_hrd_student_can_get_all_their_cv_review_schedules(): void
     {
 
@@ -253,6 +273,6 @@ class UserManagementTest extends TestCase
 
     public function test_student_can_get_all_their_payments(): void
     {
-        
+
     }
 }

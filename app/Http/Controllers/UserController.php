@@ -132,4 +132,19 @@ class UserController extends Controller implements HasMiddleware
 
         return response(['message' => 'success deleted'], 204);
     }
+    
+    public function loginUser(Request $request)
+    {
+        $user = $request->user();
+
+        return response([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone_number' => $user->phone_number,
+            'role_id' => $user->role_id,
+            'address' => $user->address,
+            'img_url' => asset('storage/' . $user['img_url'])
+        ]);
+    }
 }
