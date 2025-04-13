@@ -14,8 +14,7 @@ class AuthController extends Controller
             'name' => 'required',
             'email' =>'required|email',
             'password' => 'required|confirmed|min:6',
-            'role_id' => 'required',
-            'phone_number' => 'required'
+            'role_id' => 'required'
         ]);
 
         if ($credentials['role_id'] !== 1 && $credentials['role_id'] !== 4) {
@@ -24,6 +23,10 @@ class AuthController extends Controller
 
         if ($request['address'] !== null) {
             $credentials['address'] = $request['address'];
+        }
+
+        if ($request['phone_number'] !== null) {
+            $credentials['phone_number'] = $request['phone_number'];
         }
 
         $user = User::create($credentials);

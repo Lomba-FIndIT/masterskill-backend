@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->text('address')->nullable();
-            $table->string('phone_number');
+            $table->string('phone_number')->nullable();
             $table->foreignIdFor(Role::class);
             $table->string('img_url')->nullable();
             $table->rememberToken();

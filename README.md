@@ -38,7 +38,7 @@
 ## Endpoint
 method | url | request json | response | description | protected
 -------|-----|--------------|----------|-------------|----------
-POST | api/register | (name, email, password, password_confirmation, role_id, address(nullable), phone_number, img_url(nullable)) | - | register | [ ]
+POST | api/register | (name, email, password, password_confirmation, role_id, address(nullable), phone_number(nullable), img_url(nullable)) | - | register | [ ]
 POST | api/login | (email, password) | (token) | login | [ ]
 GET | api/logout | - | - | logout | [x]
 POST | api/courses | (course_name, category_id, instructor_id, price) | (course) | create new course | [x]
