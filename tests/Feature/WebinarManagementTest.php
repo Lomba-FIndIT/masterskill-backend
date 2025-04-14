@@ -55,4 +55,21 @@ class WebinarManagementTest extends TestCase
                 'speakers'
             ]);
     }
+
+    public function test_can_get_all_speakers(): void
+    {
+        $user = $this->dummy_user();
+
+        $response = $this->actingAs($user)->get('api/speakers');
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonCount(5)
+            ->assertJsonStructure([
+                '*' => [
+                    'speaker_name',
+                    'speaker_title'
+                ]
+            ]);
+    }
 }

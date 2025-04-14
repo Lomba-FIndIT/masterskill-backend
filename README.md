@@ -75,6 +75,7 @@ GET | api/salaries | - | [(min, max)] | get all salaries | [x]
 GET | api/experiences | - | [(experience)] | get all experiences | [x]
 GET | api/webinars | - | [(id, title, start_date, end_date, webinar_link, speakers)] | get all webinars | [x]
 GET | api/webinars/:id | - | (id, title, start_date, end_date, webinar_link, speakers) | get webinar by id | [x]
+GET | api/speakers | - | [(speaker_name, speaker_title)] | get all speakers | [x]
 
 ## Database Structure
 ### User

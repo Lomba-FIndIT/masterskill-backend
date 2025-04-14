@@ -37,4 +37,5 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('experiences', [WorkController::class, 'experiences']);
 
     Route::apiResource('webinars', WebinarController::class);
+    Route::get('speakers', [WebinarController::class, 'speakers']);
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Speaker;
 use App\Models\Webinar;
 use Illuminate\Http\Request;
 
@@ -67,5 +68,12 @@ class WebinarController extends Controller
     public function destroy(Webinar $webinar)
     {
         //
+    }
+
+    public function speakers()
+    {
+        $speakers = Speaker::all();
+
+        return response($speakers);
     }
 }

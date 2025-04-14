@@ -257,10 +257,10 @@ class UserManagementTest extends TestCase
             ]);
     }
 
-    public function test_hrd_student_can_get_all_their_cv_review_schedules(): void
-    {
+    // public function test_hrd_student_can_get_all_their_cv_review_schedules(): void
+    // {
 
-    }
+    // }
 
     public function test_student_can_get_all_their_courses(): void
     {
@@ -286,13 +286,13 @@ class UserManagementTest extends TestCase
             ]);
     }
 
-    public function test_can_get_all_joined_webinars(): void
-    {
+    // public function test_can_get_all_joined_webinars(): void
+    // {
 
-    }
+    // }
 
-    public function test_student_can_get_all_their_payments(): void
-    {
+    // public function test_student_can_get_all_their_payments(): void
+    // {
 
-    }
+    // }
 }
