@@ -66,8 +66,13 @@ PUT | api/videos/:id | (title, course_id, description, video(file)) | (id, title
 GET | api/videos/:id/stream | - | - | stream video by id | [x]
 DELETE | api/videos/:id | - | - | delete video by id | [x]
 GET | api/categories | - | - | get all categories | [x]
-GET | api/works | - | - | get all jobs | [x]
-GET | api/works/:id | - | - | get job by id | [x]
+GET | api/works | - | [(id, company_name, company_address, job_description, experience, category, min_salary, max_salary, hrd_email, contact)] | get all jobs | [x]
+GET | api/works/:id | - | (id, company_name, company_address, job_description, experience, category, min_salary, max_salary, hrd_email, contact) | get job by id | [x]
+GET | api/works/experience/:id | - | [(id, company_name, company_address, job_description, experience, category, min_salary, max_salary, hrd_email, contact)] | get all jobs by experience id | [x]
+GET | api/works/category/:id | - | [(id, company_name, company_address, job_description, experience, category, min_salary, max_salary, hrd_email, contact)] | get all jobs by category id | [x]
+GET | api/works/salary/:id | - | [(id, company_name, company_address, job_description, experience, category, min_salary, max_salary, hrd_email, contact)] | get all jobs by salary id | [x]
+GET | api/salaries | - | [(min, max)] | get all salaries | [x]
+GET | api/experiences | - | [(experience)] | get all experiences | [x]
 
 ## Database Structure
 ### User

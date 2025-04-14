@@ -18,7 +18,7 @@ class CourseFactory extends Factory
     {
         return [
             'course_name' => fake()->word(),
-            'category_id' => fake()->randomElement([1,2]),
+            'category_id' => fake()->randomElement([1,2,3,4]),
             'price' => fake()->randomElement([10000, 20000, 50000]),
             'img_url' => fake()->imageUrl()
         ];

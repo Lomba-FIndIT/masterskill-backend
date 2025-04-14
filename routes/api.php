@@ -13,9 +13,10 @@ Route::post('login', [AuthController::class, 'login'])->name('login');
 
 Route::apiResource('courses', CourseController::class);
 Route::get('courses/category/{category}', [CourseController::class, 'byCategory']);
+
 Route::middleware('auth:sanctum')->group(function() {
     Route::get('logout', [AuthController::class, 'logout']);
-
+    
     Route::get('courses/{course}/join', [CourseController::class, 'attach'])->middleware('student-only');
     Route::delete('courses/{course}/join', [CourseController::class, 'detach'])->middleware('student-only');
     Route::get('courses/{course}/students', [CourseController::class, 'students']);
@@ -31,4 +32,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('videos/{video}/stream', [VideoController::class, 'stream'])->name('video.stream');
 
     Route::apiResource('works', WorkController::class);
+    Route::get('salaries', [WorkController::class, 'salaries']);
+    Route::get('experiences', [WorkController::class, 'experiences']);
 });

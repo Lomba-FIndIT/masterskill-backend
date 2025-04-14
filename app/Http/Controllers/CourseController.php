@@ -18,7 +18,7 @@ class CourseController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('admin-only', only: ['store', 'update', 'destroy']),
-            new Middleware('auth:sanctum', except: ['index'])
+            new Middleware('auth:sanctum', except: ['index', 'byCategory'])
         ];
     }
     /**

@@ -375,11 +375,15 @@ class CourseManagementTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_can_get_all_videos_by_course_id(): void
+    public function test_can_get_all_course_by_categories(): void
     {
-        $student = $this->dummy_user('student', 2);
+        $instructor = $this->dummy_user('instructor', 2);
 
-        $response = $this->actingAs($student)->get('api/courses/category/2');
+        for ($i = 0; $i < 4; $i++) {
+            $this->dummy_course($instructor->id, 'course' . $i, 3);
+        }
+
+        $response = $this->get('api/courses/category/2');
 
         $response
             ->assertStatus(200)
