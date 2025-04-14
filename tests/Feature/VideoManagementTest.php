@@ -14,7 +14,7 @@ class VideoManagementTest extends TestCase
     use RefreshDatabase;
     /*
         - admin can upload video x
-        - admin can update video details
+        - admin can update video details x
         - admin can delete video
         - admin can get all videos
         - only admin can creaate, update, delete, get all videos
@@ -31,15 +31,15 @@ class VideoManagementTest extends TestCase
     {
         $admin = $this->dummy_user();
 
-        Storage::fake('courses-5');
-
         $video = UploadedFile::fake()->create('test.mp4', 5000);
 
         $response = $this->actingAs($admin)->post('api/videos', [
             'title' => 'test video',
             'course_id' => 5,
             'description' => 'test description',
-            'video' => $video
+            'video' => $video,
+            'duration' => 120,
+            'free' => true
         ]);
         $response
             ->assertStatus(201)
@@ -48,10 +48,82 @@ class VideoManagementTest extends TestCase
                 'title',
                 'course_id',
                 'description',
-                'video_url'
+                'video_url',
+                'duration',
+                'free'
             ]);
         $this->assertDatabaseHas('videos', [
             'id' => $response['id'],
+        ]);
+    }
+
+    public function test_can_update_video_details(): void
+    {
+        $admin = $this->dummy_user();
+
+        $video = UploadedFile::fake()->create('test.mp4', 5000);
+
+        $uploadedVideo = $this->actingAs($admin)->post('api/videos', [
+            'title' => 'test video',
+            'course_id' => 5,
+            'description' => 'test description',
+            'video' => $video,
+            'duration' => 120,
+            'free' => true
+        ]);
+
+        $response = $this->actingAs($admin)->put('api/videos/' . $uploadedVideo['id'], [
+            'title' => 'test video',
+            'course_id' => 5,
+            'description' => 'new description',
+            'video' => $video,
+            'duration' => 120,
+            'free' => false
+        ]);
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'title',
+                'course_id',
+                'description',
+                'video_url',
+                'duration',
+                'free'
+            ]);
+        $this
+            ->assertDatabaseHas('videos', [
+                'id' => $response['id'],
+                'description' => 'new description',
+                'free' => false
+            ])
+            ->assertDatabaseMissing('videos', [
+                'id' => $response['id'],
+                'video_url' => $uploadedVideo['video_url']
+            ]);
+    }
+
+    public function test_can_delete_videos(): void
+    {
+        $admin = $this->dummy_user();
+
+        $video = UploadedFile::fake()->create('test.mp4', 5000);
+
+        $uploadedVideo = $this->actingAs($admin)->post('api/videos', [
+            'title' => 'test video',
+            'course_id' => 5,
+            'description' => 'test description',
+            'video' => $video,
+            'duration' => 120,
+            'free' => true
+        ]);
+
+        $response = $this->actingAs($admin)->delete('api/videos/' . $uploadedVideo['id']);
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('videos', [
+            'id' => $uploadedVideo['id']
         ]);
     }
 }

@@ -56,6 +56,7 @@ GET | api/users | - | [(id, name, email, role_id, address, phone_number, img_url
 GET | api/user | - | (id, name, email, role_id, address, phone_number, img_url) | get login user profile | [x]
 GET | api/users/:id | - | (id, name, email, role_id, address, phone_number, img_url) | get user by id | [x]
 PUT | api/users | (id, name, email, address, phone_number, role_id, img(file)) | (id, name, email, role_id, address, phone_number, img_url) | update user profile | [x]
+GET | api/users/:id/courses | - | [(id, course_name, category, instructor, orice, img_url, total_duration, ratings)] | student get all applied courses | [x]
 DELETE | api/users/:id | - | - | delete user by id | [x]
 POST | api/videos | (title, course_id, description, video(file)) | (id, title, course_id, description, video_url) | upload video | [x]
 GET | api/videos | - | [(id, title, course_id, description, video_url)]) | get all videos | [x]
@@ -124,3 +125,4 @@ course_id | FOREIGN KEY -> courses, NOT NULL
 description | TEXT, NOT NULL
 video_url | VARCHAR, NOT 
 duration | INT, NOT NULL (second)
+free | BOOLEAN, NOT NULL, DEFAULT = false

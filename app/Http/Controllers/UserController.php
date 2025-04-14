@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -146,5 +147,34 @@ class UserController extends Controller implements HasMiddleware
             'address' => $user->address,
             'img_url' => asset('storage/' . $user['img_url'])
         ]);
+    }
+
+    public function courses(Request $request)
+    {
+        // policy
+
+        $user = $request->user();
+
+        $applied_courses = $user->applied_courses;
+
+        $filteredCourses = [];
+
+        foreach ($applied_courses as $course) {
+            $category = Category::find($course->category_id)->category_name;
+            $instructor = User::find($course->instructor_id)->name;
+
+            $filteredCourses[] = [
+                'id' => $course->id,
+                'course_name' => $course->course_name,
+                'category' => $category,
+                'instructor' => $instructor,
+                'price' => $course->price,
+                'img_url' => asset('storage/' . $course->img_url),
+                'ratings' => $course->ratings,
+                'total_duration' => $course->total_duration
+            ];
+        }
+
+        return response($filteredCourses);
     }
 }

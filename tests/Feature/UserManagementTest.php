@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -25,7 +26,7 @@ class UserManagementTest extends TestCase
         - other user cannot update other user profile x
         - can delete user by id x
         - only admin and it user can delete their profiles x
-        - login user can get their profile
+        - login user can get their profile x
         - hrd and student can get all their cv review shcedule
         - student can get all their courses
         - can get all joined webinars
@@ -263,7 +264,26 @@ class UserManagementTest extends TestCase
 
     public function test_student_can_get_all_their_courses(): void
     {
+        $student = $this->dummy_user('student', 4);
 
+        $course1 = Course::find(1);
+        $course2 = Course::find(2);
+
+        $this->actingAs($student)->get('api/courses/' . $course1->id . '/join');
+        $this->actingAs($student)->get('api/courses/' . $course2->id . '/join');
+
+        $response = $this->actingAs($student)->get('api/users/' . $student->id . '/courses');;
+        $response
+            ->assertStatus(200)
+            ->assertJsonCount(2)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'course_name',
+                    'category',
+                    'instructor'
+                ]
+            ]);
     }
 
     public function test_can_get_all_joined_webinars(): void

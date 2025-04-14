@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignIdFor(Course::class);
             $table->text('description');
             $table->string('video_url');
+            $table->bigInteger('duration');
+            $table->boolean('free')->default(false);
             $table->timestamps();
         });
     }

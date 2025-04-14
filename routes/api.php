@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     Route::apiResource('users', UserController::class);
     Route::get('user', [UserController::class, 'loginUser']);
+    Route::get('users/{user}/courses', [UserController::class, 'courses']);
 
     Route::apiResource('videos', VideoController::class)->middleware('admin-only');
 });
