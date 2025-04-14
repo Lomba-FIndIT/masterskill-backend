@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\WebinarController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,4 +35,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::apiResource('works', WorkController::class);
     Route::get('salaries', [WorkController::class, 'salaries']);
     Route::get('experiences', [WorkController::class, 'experiences']);
+
+    Route::apiResource('webinars', WebinarController::class);
 });

@@ -17,7 +17,8 @@ class SpeakerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'speaker_name' => fake()->name(),
+            'speaker_title' => fake()->randomElement(['S.Si', 'Spd'])
         ];
     }
 }

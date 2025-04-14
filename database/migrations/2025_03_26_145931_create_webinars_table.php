@@ -18,9 +18,9 @@ return new class extends Migration
         Schema::create('webinars', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->foreignIdFor(Schedule::class);
+            $table->timestamp('start_date');
+            $table->timestamp('end_date');
             $table->string('webinar_link');
-            $table->date('duration');
             $table->timestamps();
         });
 

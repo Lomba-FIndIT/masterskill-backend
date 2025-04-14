@@ -73,6 +73,8 @@ GET | api/works/category/:id | - | [(id, company_name, company_address, job_desc
 GET | api/works/salary/:id | - | [(id, company_name, company_address, job_description, experience, category, min_salary, max_salary, hrd_email, contact)] | get all jobs by salary id | [x]
 GET | api/salaries | - | [(min, max)] | get all salaries | [x]
 GET | api/experiences | - | [(experience)] | get all experiences | [x]
+GET | api/webinars | - | [(id, title, start_date, end_date, webinar_link, speakers)] | get all webinars | [x]
+GET | api/webinars/:id | - | (id, title, start_date, end_date, webinar_link, speakers) | get webinar by id | [x]
 
 ## Database Structure
 ### User
@@ -162,3 +164,26 @@ attributes | description
 id | PRIMARY KEY, INT, NOT NULL
 min | INT, NOT NULL
 max | INT, NOT NULL
+
+### Schedule
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+start | DATE, NOT NULL
+end | DATE, NOT NULL
+
+### Webinar
+attribues | description
+----------|------------
+id | PRIMARY KEY, INT NOT NULL
+title | VARCHAR, NOT NULL
+start_date | TIMESTAMP, NOT NULL
+end_date | TIMESTAMP, NOT NULL
+webinar_link | VARCHAR, NOT NULL
+
+### Speaker
+attribues | description
+----------|------------
+id | PRIMARY KEY, INT NOT NULL
+speaker_name | VARCHAR, NOT NULL
+speaker_title | VARCHAR, NOT NULL
