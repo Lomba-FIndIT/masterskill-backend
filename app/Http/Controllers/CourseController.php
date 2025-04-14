@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Course;
 use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
     {
         return [
-            new Middleware('admin-only', only: ['store', 'update', 'destroy'])
+            new Middleware('admin-only', only: ['store', 'update', 'destroy']),
+            new Middleware('auth:sanctum', except: ['index'])
         ];
     }
     /**
@@ -23,7 +28,25 @@ class CourseController extends Controller implements HasMiddleware
     {
         $courses = Course::all();
 
-        return response($courses);
+        $filteredCourses = [];
+
+        foreach ($courses as $course) {
+            $category = Category::find($course->category_id)->category_name;
+            $instructor = User::find($course->instructor_id)->name;
+
+            $filteredCourses[] = [
+                'id' => $course->id,
+                'course_name' => $course->course_name,
+                'category' => $category,
+                'instructor' => $instructor,
+                'price' => $course->price,
+                'img_url' => asset('storage/' . $course->img_url),
+                'ratings' => $course->ratings,
+                'total_duration' => $course->total_duration
+            ];
+        }
+
+        return response($filteredCourses);
     }
 
     /**
@@ -35,12 +58,30 @@ class CourseController extends Controller implements HasMiddleware
             'course_name' => 'required',
             'category_id' => 'required',
             'instructor_id' => 'required',
-            'price' => 'required'
+            'price' => 'required',
+            'img' => 'required|file|mimes:png,jpg,pdf'
         ]);
 
         $course = Course::create($validatedFields);
+        $course->refresh();
 
-        return response($course, 201);
+        $validatedFields['img_url'] = $request->img->store('courses-' . $course->id, 'public');
+
+        $course->update($validatedFields);
+
+        $category = Category::find($course->category_id)->category_name;
+        $instructor = User::find($course->instructor_id)->name;
+
+        return response([
+            'id' => $course->id,
+            'course_name' => $course->course_name,
+            'category' => $category,
+            'instructor' => $instructor,
+            'price' => $course->price,
+            'img_url' => asset('storage/' . $course->img_url),
+            'ratings' => $course->ratings,
+            'total_duration' => $course->total_duration
+        ], 201);
     }
 
     /**
@@ -48,7 +89,21 @@ class CourseController extends Controller implements HasMiddleware
      */
     public function show(Course $course)
     {
-        return response($course);
+        $category = Category::find($course->category_id)->category_name;
+        $instructor = User::find($course->instructor_id)->name;
+
+        $filteredCourse = [
+            'id' => $course->id,
+                'course_name' => $course->course_name,
+                'category' => $category,
+                'instructor' => $instructor,
+                'price' => $course->price,
+                'img_url' => asset('storage/' . $course->img_url),
+                'ratings' => $course->ratings,
+                'total_duration' => $course->total_duration
+        ];
+        
+        return response($filteredCourse);
     }
 
     /**
@@ -60,19 +115,39 @@ class CourseController extends Controller implements HasMiddleware
             'course_name' => 'required',
             'category_id' => 'required',
             'instructor_id' => 'required',
-            'price' => 'required'
+            'price' => 'required',
+            'img' => 'required|file|mimes:png,jpg,pdf'
         ]);
 
+        if ($request->hasFile('img')) {
+            Storage::delete($course->img_url);
+            
+            $validatedFields['img_url'] = $request->img->store('courses-' . $course->id, 'public');
+        }
+        
         $course->update($validatedFields);
 
-        return response($course);
+        $category = Category::find($course->category_id)->category_name;
+        $instructor = User::find($course->instructor_id)->name;
+        
+        return response([
+            'id' => $course->id,
+            'course_name' => $course->course_name,
+            'category' => $category,
+            'instructor' => $instructor,
+            'price' => $course->price,
+            'img_url' => asset('storage/' . $course->img_url),
+            'ratings' => $course->ratings,
+            'total_duration' => $course->total_duration
+        ]);
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Course $course)
     {
+        Storage::delete($course->img_url);
         $course->delete();
 
         return response(null, 204);
@@ -86,9 +161,15 @@ class CourseController extends Controller implements HasMiddleware
             'student_id' => $user->id
         ]);
 
-        $course->students()->attach($user->id, ['payment_id' => $payment->id]);
+        $course->students()->attach($user->id, ['payment_id' => $payment->id, 'rating' => 0]);
 
-        return response(null, 201);
+        $ratings = $course->students()->wherePivot('rating', '>', 0)->avg('course_user.rating');
+
+        $course->update([
+            'ratings' => $ratings !== null ? $ratings : 0
+        ]);
+
+        return response(['message' => 'successfully joined course ' . $course->name], 201);
     }
 
     public function detach(Request $request, Course $course)
@@ -102,6 +183,12 @@ class CourseController extends Controller implements HasMiddleware
 
         $course->students()->detach($user->id);
 
+        $ratings = $course->students()->wherePivot('rating', '>', 0)->avg('course_user.rating');
+
+        $course->update([
+            'ratings' => $ratings !== null ? $ratings : 0
+        ]);
+
         return response(null, 204);
     }
 
@@ -110,5 +197,30 @@ class CourseController extends Controller implements HasMiddleware
         $students = $course->students;
 
         return response($students);
+    }
+
+    public function rate(Request $request, Course $course)
+    {
+        Gate::authorize('rate', $course);
+
+        $validatedFields = $request->validate([
+            'rate' => 'required|numeric|max:5|min:0'
+        ]);
+
+        $user = $request->user();
+
+        $student = $course->students()->wherePivot('user_id', $user->id)->first();
+
+        $student->pivot->update([
+            'rating' => $validatedFields['rate']
+        ]);
+
+        $ratings = $course->students()->wherePivot('rating', '>', 0)->avg('course_user.rating');
+
+        $course->update([
+            'ratings' => $ratings !== null ? $ratings : 0
+        ]);
+
+        return response(['message' => 'rating given ' . $validatedFields['rate']], 200);
     }
 }

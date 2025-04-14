@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Course;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class CourseManagementTest extends TestCase
@@ -27,6 +30,7 @@ class CourseManagementTest extends TestCase
         - student can cancel course x
         - only student can cancel course x
         - can get all students by course id x
+        - user can give course ratings
         - can get all videos by course id
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
@@ -50,28 +54,38 @@ class CourseManagementTest extends TestCase
     {
         $admin = $this->dummy_user();
 
+        $img = UploadedFile::fake()->image('course.jpg');
+
         $instructor = $this->dummy_user('instructor', 2);
 
         $response = $this->actingAs($admin)->postJson('api/courses', [
             'course_name' => 'test course',
             'category_id' => 1,
             'instructor_id' => $instructor->id,
-            'price' => 20000
+            'price' => 20000,
+            'img' => $img
         ]);
+
+        $category = Category::find(1);
 
         $response
             ->assertStatus(201)
+            ->assertJson([
+                'course_name' => 'test course',
+                'category' => $category->category_name,
+                'instructor' => $instructor->name,
+                'price' => 20000,
+                'total_duration' => 0
+            ])
             ->assertJsonStructure([
-                'course_name',
-                'category_id',
-                'instructor_id',
-                'price'
+                'img_url'
             ]);
         $this->assertDatabaseHas('courses', [
             'course_name' => 'test course',
             'category_id' => 1,
             'instructor_id' => $instructor->id,
-            'price' => 20000
+            'price' => 20000,
+            'total_duration' => 0
         ]);
     }
 
@@ -93,11 +107,22 @@ class CourseManagementTest extends TestCase
 
     public function test_can_get_all_courses(): void
     {
-        $student = $this->dummy_user('student', 4);
+        $response = $this->get('api/courses');
 
-        $response = $this->actingAs($student)->get('api/courses');
-
-        $response->assertJsonCount(10);
+        $response
+            ->assertJsonCount(10)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'course_name',
+                    'category',
+                    'instructor',
+                    'price',
+                    'img_url',
+                    'total_duration',
+                    'ratings'
+                ]
+            ]);
     }
 
     public function test_can_get_course_by_id(): void
@@ -113,11 +138,15 @@ class CourseManagementTest extends TestCase
         $response
             ->assertStatus(200)
             ->assertJsonStructure([
-            'course_name',
-            'category_id',
-            'instructor_id',
-            'price'
-        ]);
+                'id',
+                'course_name',
+                'category',
+                'instructor',
+                'price',
+                'img_url',
+                'total_duration',
+                'ratings'
+            ]);
     }
 
     public function test_can_update_course(): void
@@ -128,11 +157,14 @@ class CourseManagementTest extends TestCase
 
         $course = $this->dummy_course($instructor->id);
 
+        $img = UploadedFile::fake()->image('course.jpg');
+
         $response = $this->actingAs($admin)->putJson('api/courses/' . $course->id, [
             'course_name' => $course->course_name,
             'category_id' => 2,
             'instructor_id' => $instructor->id,
-            'price' => $course->price
+            'price' => $course->price,
+            'img' => $img
         ]);
 
         $response->assertStatus(200);
@@ -274,6 +306,72 @@ class CourseManagementTest extends TestCase
         $response
             ->assertStatus(200)
             ->assertJsonCount(5);
+    }
+
+    public function test_student_can_give_course_ratings(): void
+    {
+        $student1 = $this->dummy_user('student1', 4);
+        $student2 = $this->dummy_user('student2', 4);
+
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $this->actingAs($student1)->get('api/courses/' . $course->id . '/join');
+        $this->actingAs($student2)->get('api/courses/' . $course->id . '/join');
+        
+        $response1 = $this->actingAs($student1)->postJson('api/courses/' . $course->id . '/rate', [
+            'rate' => 5
+        ]);
+        $response2 = $this->actingAs($student2)->postJson('api/courses/' . $course->id . '/rate', [
+            'rate' => 4
+        ]);
+
+        $response1->assertStatus(200);
+        $response2->assertStatus(200);
+        $this->assertDatabaseHas('courses', [
+            'id' => $course->id,
+            'ratings' => 4.5
+        ]);
+    }
+
+    public function test_cannot_give_ratings_lesser_than_0_or_greater_than_5(): void
+    {
+        $student = $this->dummy_user('student', 4);
+
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $this->actingAs($student)->get('api/courses/' . $course->id . '/join');
+        
+        $response1 = $this->actingAs($student)->postJson('api/courses/' . $course->id . '/rate', [
+            'rate' => -1
+        ]);
+        $response2 = $this->actingAs($student)->postJson('api/courses/' . $course->id . '/rate', [
+            'rate' => 6
+        ]);
+
+        $response1->assertStatus(422);
+        $response2->assertStatus(422);
+    }
+
+    public function test_only_assigned_course_student_can_give_rating_on_it_course(): void
+    {
+        $student1 = $this->dummy_user('student1', 4);
+        $student2 = $this->dummy_user('student2', 4);
+
+        $instructor = $this->dummy_user('instructor', 2);
+
+        $course = $this->dummy_course($instructor->id);
+
+        $this->actingAs($student1)->get('api/courses/' . $course->id . '/join');
+        
+        $response = $this->actingAs($student2)->postJson('api/courses/' . $course->id . '/rate', [
+            'rate' => 5
+        ]);
+
+        $response->assertStatus(403);
     }
 
     public function test_can_get_all_videos_by_course_id(): void

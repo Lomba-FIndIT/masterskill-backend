@@ -41,26 +41,27 @@ method | url | request json | response | description | protected
 POST | api/register | (name, email, password, password_confirmation, role_id, address(nullable), phone_number(nullable), img_url(nullable)) | - | register | [ ]
 POST | api/login | (email, password) | (token) | login | [ ]
 GET | api/logout | - | - | logout | [x]
-POST | api/courses | (course_name, category_id, instructor_id, price) | (course) | create new course | [x]
-GET | api/courses | - | (courses) | get all courses | [x]
-GET | api/courses/:id | - | (course) | get course by id | [x]
-PUT | api/courses/:id | (course_name, category_id, instructor_id, price) | (course) | update course by id | [x]
+POST | api/courses | (course_name, category, instructor_id, price, img(file)) | (id, course_name, category, instructor, price, img_url, total_duration, ratings) | create new course | [x]
+GET | api/courses | - | [(id, course_name, category, instructor, price, img_url, total_duration, ratings)] | get all courses | [ ]
+GET | api/courses/:id | - | (id, course_name, category, instructor, price, img_url, total_duration, ratings) | get course by id | [x]
+PUT | api/courses/:id | (course_name, category, instructor_id, price, img(file)) | (id, course_name, category, instructor, price, img_url, total_duration, ratings) | update course by id | [x]
 DELETE | api/courses/:id | - | - | delete course by id | [x]
 GET | api/courses/:id/join | - | - | student assigning course by id | [x]
 DELETE | api/courses/:id/join | - | - | student cancelling course by id | [x]
-GET | api/courses/:id/students | - | (students) | get all students by course id | [x]
-GET | api/courses/:id/videos | - | (videos) | get all videos by course id | [x]
-POST | api/users | (name, email, password, password_confirmation, phone_number, role_id) | (user) | create user (instructor, hrd) | [x]
-GET | api/users | - | (users) | get all users | [x]
-GET | api/user | - | (id, name, email, phone_number, role_id, address, img_url) | get login user profile | [x]
-GET | api/users/:id | - | (id, name, email, phone_number, role_id, address, img_url) | get user by id | [x]
-PUT | api/users | (id, name, email, address, phone_number, role_id, img(file)) | (user) | update user profile | [x]
+POST | api/courses/:id/rate | (rate) | - | student give the course rate | [x]
+GET | api/courses/:id/students | - | [(id, name, email, role_id, address, phone_number, img_url)] | get all students by course id | [x]
+GET | api/courses/:id/videos | - | [(id, title, course_id, description, video_url)] | get all videos by course id | [x]
+POST | api/users | (name, email, password, password_confirmation, phone_number, role_id) | (id, name, email, role_id, address, phone_number, img_url) | create user (instructor, hrd) | [x]
+GET | api/users | - | [(id, name, email, role_id, address, phone_number, img_url)] | get all users | [x]
+GET | api/user | - | (id, name, email, role_id, address, phone_number, img_url) | get login user profile | [x]
+GET | api/users/:id | - | (id, name, email, role_id, address, phone_number, img_url) | get user by id | [x]
+PUT | api/users | (id, name, email, address, phone_number, role_id, img(file)) | (id, name, email, role_id, address, phone_number, img_url) | update user profile | [x]
 DELETE | api/users/:id | - | - | delete user by id | [x]
-POST | api/videos | (title, course_id, description, video(file)) | (title, course_id, description, video_url) | upload video | [x]
-GET | api/videos | - | (videos) | get all videos | [x]
-GET | api/videos/:id | - | (video) | get video by id | [x]
-PUT | api/videos/:id | (title, course_id, description, video(file)) | (title, course_id, description, video_url) | update video by id | [x]
-DELETE | api/videos/:id | - | delete video by id | [x]
+POST | api/videos | (title, course_id, description, video(file)) | (id, title, course_id, description, video_url) | upload video | [x]
+GET | api/videos | - | [(id, title, course_id, description, video_url)]) | get all videos | [x]
+GET | api/videos/:id | - | (id, title, course_id, description, video_url) | get video by id | [x]
+PUT | api/videos/:id | (title, course_id, description, video(file)) | (id, title, course_id, description, video_url) | update video by id | [x]
+DELETE | api/videos/:id | - | - | delete video by id | [x]
 
 ## Database Structure
 ### User
@@ -88,6 +89,9 @@ course_name | VARCHAR, NOT NULL
 category_id | FOREIGN KEY -> categories, NOT NULL
 price | INT, NOT NULL
 instructor_id | FOREIGN KEY -> users, NOT NULL
+img_url | VARCHAR, NOT NULL
+total_duration | INT, NOT NULL, DEFAULT = 0 (seconds)
+ratings | DOUBLE, NULLABLE, DEFAULT = 0
 
 ### course_user
 attributes | description
@@ -96,6 +100,7 @@ id | PRIMARY KEY, INT, NOT NULL
 course_id | FOREIGN KEY -> courses, NOT NULL
 user_id | FOREIGN KEY -> users, NOT NULL
 payment_id | FOREIGN KEY -> payments, NOT NULL
+rating | DOUBLE, NOT NULL, DEFAULT = 0
 
 ### Category
 attributes | description
@@ -117,4 +122,5 @@ id | PRIMARY KEY, INT, NOT NULL
 title | VARCHAR, NOT NULL
 course_id | FOREIGN KEY -> courses, NOT NULL
 description | TEXT, NOT NULL
-video_url | VARCHAR, NOT NULL
+video_url | VARCHAR, NOT 
+duration | INT, NOT NULL (second)

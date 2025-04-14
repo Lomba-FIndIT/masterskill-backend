@@ -21,6 +21,9 @@ return new class extends Migration
             $table->foreignIdFor(Category::class);
             $table->bigInteger('price');
             $table->foreignIdFor(User::class, 'instructor_id');
+            $table->string('img_url')->nullable();
+            $table->bigInteger('total_duration')->default(0);
+            $table->double('ratings')->default(0);
             $table->timestamps();
         });
         
@@ -29,6 +32,7 @@ return new class extends Migration
             $table->foreignIdFor(Course::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Payment::class);
+            $table->double('rating')->default(0);
             $table->timestamps();
         });
     }

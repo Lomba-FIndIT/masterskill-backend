@@ -17,12 +17,14 @@ class Course extends Model
         'course_name',
         'category_id',
         'instructor_id',
-        'price'
+        'price',
+        'total_duration',
+        'ratings'
     ];
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withPivot('payment_id');
+        return $this->belongsToMany(User::class)->withPivot(['payment_id', 'rating']);
     }
 
     public function category(): BelongsTo
