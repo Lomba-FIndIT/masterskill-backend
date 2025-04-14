@@ -21,9 +21,7 @@ class CategoryManagementTest extends TestCase
 
     public function test_can_get_all_categories(): void
     {
-        $user = $this->dummy_user('student', 4);
-
-        $response = $this->actingAs($user)->get('api/categories');
+        $response = $this->get('api/categories');
 
         $response
             ->assertStatus(200)

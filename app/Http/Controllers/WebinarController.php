@@ -44,6 +44,7 @@ class WebinarController extends Controller
      */
     public function show(Webinar $webinar)
     {
+        // dd($webinar->start_date);
         return response([
             'id' => $webinar->id,
             'title' => $webinar->title,

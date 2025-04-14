@@ -18,8 +18,8 @@ return new class extends Migration
         Schema::create('webinars', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->timestamp('start_date');
-            $table->timestamp('end_date');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
             $table->string('webinar_link');
             $table->timestamps();
         });

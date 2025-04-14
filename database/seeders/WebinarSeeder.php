@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Speaker;
 use App\Models\Webinar;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -34,8 +35,8 @@ class WebinarSeeder extends Seeder
 
         foreach ($schedules as $schedule) {
             $webinar = Webinar::factory()->create([
-                'start_date' => $schedule['start'],
-                'end_date' => $schedule['end']
+                'start_date' => Carbon::parse($schedule['start']),
+                'end_date' => Carbon::parse($schedule['end'])
             ]);
 
             $webinar->speakers()->attach($speaker1->id);
