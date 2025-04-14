@@ -30,7 +30,8 @@ class CourseManagementTest extends TestCase
         - student can cancel course x
         - only student can cancel course x
         - can get all students by course id x
-        - user can give course ratings
+        - user can give course ratings x
+        - can get all course by category
         - can get all videos by course id
     */
     public function dummy_user($name = 'admin', $role_id = 1): User
@@ -376,6 +377,23 @@ class CourseManagementTest extends TestCase
 
     public function test_can_get_all_videos_by_course_id(): void
     {
-        
+        $student = $this->dummy_user('student', 2);
+
+        $response = $this->actingAs($student)->get('api/courses/category/2');
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'course_name',
+                    'category',
+                    'instructor',
+                    'price',
+                    'img_url',
+                    'total_duration',
+                    'ratings'
+                ]
+            ]);
     }
 }

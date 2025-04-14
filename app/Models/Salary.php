@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Salary extends Model
 {
     protected $fillable = [
-        'per_month'
+        'min',
+        'max'
     ];
 
     public function works(): HasMany

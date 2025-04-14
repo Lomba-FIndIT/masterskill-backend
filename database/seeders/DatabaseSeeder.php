@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
             ->call(RoleSeeder::class)
             ->call(CategorySeeder::class)
             ->call(UserSeeder::class)
-            ->call(CourseSeeder::class);
+            ->call(CourseSeeder::class)
+            ->call(SalarySeeder::class)
+            ->call(ExperienceSeeder::class)
+            ->call(WorkSeeder::class);
     }
 }

@@ -50,6 +50,7 @@ GET | api/courses/:id/join | - | - | student assigning course by id | [x]
 DELETE | api/courses/:id/join | - | - | student cancelling course by id | [x]
 POST | api/courses/:id/rate | (rate) | - | student give the course rate | [x]
 GET | api/courses/:id/students | - | [(id, name, email, role_id, address, phone_number, img_url)] | get all students by course id | [x]
+GET | api/courses/category/:id | - | [(id, course_name, category, instructor, price, img_url, total_duration, ratings)] | get all courses by catogry | [x]
 GET | api/courses/:id/videos | - | [(id, title, course_id, description, video_url)] | get all videos by course id | [x]
 POST | api/users | (name, email, password, password_confirmation, phone_number, role_id) | (id, name, email, role_id, address, phone_number, img_url) | create user (instructor, hrd) | [x]
 GET | api/users | - | [(id, name, email, role_id, address, phone_number, img_url)] | get all users | [x]
@@ -64,6 +65,9 @@ GET | api/videos/:id | - | (id, title, course_id, description, video_url) | get 
 PUT | api/videos/:id | (title, course_id, description, video(file)) | (id, title, course_id, description, video_url) | update video by id | [x]
 GET | api/videos/:id/stream | - | - | stream video by id | [x]
 DELETE | api/videos/:id | - | - | delete video by id | [x]
+GET | api/categories | - | - | get all categories | [x]
+GET | api/works | - | - | get all jobs | [x]
+GET | api/works/:id | - | - | get job by id | [x]
 
 ## Database Structure
 ### User
@@ -127,3 +131,29 @@ description | TEXT, NOT NULL
 video_url | VARCHAR, NOT 
 duration | INT, NOT NULL (second)
 free | BOOLEAN, NOT NULL, DEFAULT = false
+
+### Work
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+company_name | VARCHAR, NOT NULL
+company_address | TEXT, NOT NULL
+job_description | TEXT, NOT NULL
+experience_id | FOREIGN KEY -> experiences, NOT NULL
+category_id | FOREIGN KEY -> categories, NOT NULL
+salary_id | FOREIGN KEY -> salaries
+hrd_email | VARCHAR, NOT NULL
+contact | VARCHAR, NOT NULL
+
+### Experience
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+experience | VARCHAR, NOT NULL
+
+### Salary
+attributes | description
+-----------|------------
+id | PRIMARY KEY, INT, NOT NULL
+min | INT, NOT NULL
+max | INT, NOT NULL

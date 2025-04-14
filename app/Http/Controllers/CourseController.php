@@ -223,4 +223,27 @@ class CourseController extends Controller implements HasMiddleware
 
         return response(['message' => 'rating given ' . $validatedFields['rate']], 200);
     }
+
+    public function byCategory (Category $category) {
+        $courses = Course::where('category_id', '=', $category->id)->get();
+
+        $filteredCourses = [];
+
+        foreach ($courses as $course) {
+            $instructor = User::find($course->instructor_id)->name;
+
+            $filteredCourses[] = [
+                'id' => $course->id,
+                'course_name' => $course->course_name,
+                'category' => $category->category_name,
+                'instructor' => $instructor,
+                'price' => $course->price,
+                'img_url' => asset('storage/' . $course->img_url),
+                'ratings' => $course->ratings,
+                'total_duration' => $course->total_duration
+            ];
+        }
+
+        return response($filteredCourses);
+    }
 }

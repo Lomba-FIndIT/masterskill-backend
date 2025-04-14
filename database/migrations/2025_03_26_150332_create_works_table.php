@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('company_name');
             $table->text('company_address');
-            $table->string('job_description');
+            $table->text('job_description');
             $table->foreignIdFor(Experience::class);
             $table->foreignIdFor(Category::class);
             $table->foreignIdFor(Salary::class);
