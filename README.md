@@ -62,6 +62,7 @@ POST | api/videos | (title, course_id, description, video(file)) | (id, title, c
 GET | api/videos | - | [(id, title, course_id, description, video_url)]) | get all videos | [x]
 GET | api/videos/:id | - | (id, title, course_id, description, video_url) | get video by id | [x]
 PUT | api/videos/:id | (title, course_id, description, video(file)) | (id, title, course_id, description, video_url) | update video by id | [x]
+GET | api/videos/:id/stream | - | - | stream video by id | [x]
 DELETE | api/videos/:id | - | - | delete video by id | [x]
 
 ## Database Structure

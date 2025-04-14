@@ -22,5 +22,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('user', [UserController::class, 'loginUser']);
     Route::get('users/{user}/courses', [UserController::class, 'courses']);
 
-    Route::apiResource('videos', VideoController::class)->middleware('admin-only');
+    Route::apiResource('videos', VideoController::class);
+    Route::get('videos/{video}/stream', [VideoController::class, 'stream'])->name('video.stream');
 });
